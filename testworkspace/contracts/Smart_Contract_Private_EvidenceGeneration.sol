@@ -58,16 +58,20 @@ contract NewEvidence_SmartContractStorage{
 
 contract SmartContractFactory {
     mapping(address => address) public userToContract;
+    mapping(address => bool) public hasCreatedContract;
 
     event ContractCreated(address indexed user, address indexed contractAddress);
 
     function createSmartContract() external {
+        require(!hasCreatedContract[msg.sender], "You have already created a smart contract");
+
         // Create a new smart contract with the caller as the owner
         NewEvidence_SmartContractStorage newContract = new NewEvidence_SmartContractStorage(msg.sender);
-        
+
         // Store the mapping between the user and the created contract address
         userToContract[msg.sender] = address(newContract);
-        
+        hasCreatedContract[msg.sender] = true;
+
         emit ContractCreated(msg.sender, address(newContract));
     }
 }
